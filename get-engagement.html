@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Engagement</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            background-color: #0a0a0f;
+            color: #f0f0ff;
+            margin: 0;
+            padding: 0;
+        }
+        .card {
+            background-color: #111118;
+            border: 1px solid #222230;
+            padding: 16px;
+            margin: 16px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .card input:focus {
+            border: 1px solid #00ff88;
+        }
+        .tab-bar {
+            display: flex;
+            overflow-x: auto;
+            padding: 16px;
+            background-color: #0a0a0f;
+        }
+        .tab-bar button {
+            background-color: #111118;
+            border: none;
+            padding: 16px;
+            margin-right: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .tab-bar button.active {
+            background-color: #00ff88;
+            color: #000;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .button {
+            background-color: #00ff88;
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #a855f7;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #111118;
+            border: 1px solid #222230;
+            border-radius: 8px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background-color: #00ff88;
+            border-radius: 8px;
+        }
+        .timer {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 16px;
+        }
+        .copy-button {
+            background-color: #00ff88;
+            color: #000;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .copy-button:hover {
+            background-color: #a855f7;
+        }
+        .powered-by {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background-color: #00ff88;
+            color: #000;
+            padding: 8px;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Get Engagement</h1>
+        <p>Launch my skool</p>
+        <div class="powered-by">Powered by Free AI</div>
+    </header>
+    <nav class="tab-bar">
+        <button class="active" onclick="switchTab('board')">Board</button>
+        <button onclick="switchTab('tasks')">Tasks</button>
+        <button onclick="switchTab('ideas')">Ideas</button>
+        <button onclick="switchTab('progress')">Progress</button>
+        <button onclick="switchTab('ai-prompts')">AI Prompts</button>
+    </nav>
+    <div class="tab-content active" id="board">
+        <div class="card">
+            <h2>Board</h2>
+            <div id="board-columns">
+                <div id="column-1" class="board-column">
+                    <h3>Leads</h3>
+                    <ul id="leads-list">
+                        <!-- leads list will be populated here -->
+                    </ul>
+                </div>
+                <div id="column-2" class="board-column">
+                    <h3>Outreach</h3>
+                    <ul id="outreach-list">
+                        <!-- outreach list will be populated here -->
+                    </ul>
+                </div>
+                <div id="column-3" class="board-column">
+                    <h3>Platform</h3>
+                    <ul id="platform-list">
+                        <!-- platform list will be populated here -->
+                    </ul>
+                </div>
+            </div>
+            <button class="button" onclick="addCard()">Add Card</button>
+        </div>
+    </div>
+    <div class="tab-content" id="tasks">
+        <div class="card">
+            <h2>Tasks</h2>
+            <input id="task-input" type="text" placeholder="Enter task">
+            <button class="button" onclick="addTask()">Add Task</button>
+            <ul id="task-list">
+                <!-- tasks will be populated here -->
+            </ul>
+        </div>
+    </div>
+    <div class="tab-content" id="ideas">
+        <div class="card">
+            <h2> Ideas</h2>
+            <textarea id="ideas-textarea"></textarea>
+        </div>
+    </div>
+    <div class="tab-content" id="progress">
+        <div class="card">
+            <h2>Progress</h2>
+            <div class="progress-bar">
+                <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <p id="progress-text">0% Complete</p>
+        </div>
+    </div>
+    <div class="tab-content" id="ai-prompts">
+        <div class="card">
+            <h2>AI Prompts</h2>
+            <p><strong>Prompt 1:</strong></p>
+            <code>Write a social media post to promote my skool and increase engagement.</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+            <p><strong>Prompt 2:</strong></p>
+            <code>Generate a list of 10 potential leads for my skool.</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+            <p><strong>Prompt 3:</strong></p>
+            <code>Write a script for a video to introduce my skool and its mission.</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+            <p><strong>Prompt 4:</strong></p>
+            <code>Develop a content calendar for my skool's social media accounts.</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+            <p><strong>Prompt 5:</strong></p>
+            <code>Design a logo for my skool that represents its values and mission.</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+            <p><strong>Ollama Terminal Commands:</strong></p>
+            <code>ollama --init</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+            <code>ollama --generate-leads</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+            <code>ollama --create-content-calendar</code>
+            <button class="copy-button" onclick="navigator.clipboard.writeText(this.previousElementSibling.innerText).then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',2000)})">Copy</button>
+        </div>
+    </div>
+    <script>
+        let currentTab = 'board';
+        let leads = [];
+        let outreach = [];
+        let platform = [];
+        let tasks = [];
+        let ideas = '';
+        let progress = 0;
+
+        function switchTab(tab) {
+            document.querySelector('.tab-content.active').classList.remove('active');
+            document.querySelector(`#${tab}`).classList.add('active');
+            document.querySelector('.tab-bar button.active').classList.remove('active');
+            document.querySelector(`.tab-bar button[onclick="switchTab('${tab}')"]`).classList.add('active');
+            currentTab = tab;
+        }
+
+        function addCard() {
+            const card = document.createElement('li');
+            card.innerHTML = `
+                <input type="text" placeholder="Enter card title">
+                <button class="button" onclick="deleteCard(this)">Delete</button>
+            `;
+            document.querySelector('#leads-list').appendChild(card);
+        }
+
+        function deleteCard(button) {
+            button.parentNode.remove();
+        }
+
+        function addTask() {
+            const task = document.querySelector('#task-input').value;
+            tasks.push(task);
+            const taskElement = document.createElement('li');
+            taskElement.innerHTML = `
+                <input type="checkbox" onclick="updateProgress()">
+                <span>${task}</span>
+                <button class="button" onclick="deleteTask(this)">Delete</button>
+            `;
+            document.querySelector('#task-list').appendChild(taskElement);
+            document.querySelector('#task-input').value = '';
+            updateProgress();
+        }
+
+        function deleteTask(button) {
+            button.parentNode.remove();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
+            let completed = 0;
+            for (let i = 0; i < checkboxes.length; i++) {
+                if (checkboxes[i].checked) {
+                    completed++;
+                }
+            }
+            progress = (completed / checkboxes.length) * 100;
+            document.querySelector('#progress-fill').style.width = `${progress}%`;
+            document.querySelector('#progress-text').textContent = `${progress}% Complete`;
+        }
+
+        function saveData() {
+            localStorage.setItem('dashboard_get_engagement', JSON.stringify({
+                leads: leads,
+                outreach: outreach,
+                platform: platform,
+                tasks: tasks,
+                ideas: ideas,
+                progress: progress
+            }));
+        }
+
+        function loadData() {
+            const data = JSON.parse(localStorage.getItem('dashboard_get_engagement'));
+            if (data) {
+                leads = data.leads;
+                outreach = data.outreach;
+                platform = data.platform;
+                tasks = data.tasks;
+                ideas = data.ideas;
+                progress = data.progress;
+                updateProgress();
+            }
+        }
+
+        loadData();
+
+        document.querySelector('#ideas-textarea').addEventListener('input', () => {
+            ideas = document.querySelector('#ideas-textarea').value;
+            saveData();
+        });
+
+        setInterval(saveData, 1000);
+    </script>
+</body>
+</html>
