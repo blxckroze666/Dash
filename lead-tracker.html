@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lead Tracker</title>
+<style>
+:root{--accent:#00ff88;--accent-dark:#00cc6e;--bg:#0a0a0f;--surface:#111118;--surface2:#0d0d15;--text:#f0f0ff;--text-dim:#888;--line:#222230;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:system-ui,sans-serif;min-height:100vh;}
+.header{background:var(--surface);border-bottom:3px solid var(--accent);padding:20px;text-align:center;}
+.header h1{font-size:24px;font-weight:900;color:var(--accent);}
+.header p{font-size:12px;color:var(--text-dim);margin-top:4px;}
+.powered{display:inline-block;background:var(--accent);color:#000;font-size:9px;font-weight:800;letter-spacing:2px;padding:2px 8px;text-transform:uppercase;margin-top:8px;}
+.tabs{display:flex;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--line);}
+.tab{flex-shrink:0;padding:12px 18px;font-size:12px;font-weight:700;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.panel{display:none;padding:20px;max-width:800px;margin:0 auto;}
+.panel.active{display:block;}
+.widget{background:var(--surface);border:1px solid var(--line);padding:16px;margin-bottom:14px;}
+.wt{font-size:14px;font-weight:900;margin-bottom:12px;color:var(--text);}
+.list-item{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);}
+.chk{width:18px;height:18px;border:2px solid #333;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.chk.done{background:var(--accent);border-color:var(--accent);}
+.li-text{font-size:12px;color:#ccc;flex:1;}
+.li-text.done{text-decoration:line-through;color:#444;}
+.add-row{display:flex;gap:8px;margin-bottom:10px;}
+.add-input{flex:1;background:var(--surface2);border:1px solid var(--line);color:var(--text);font-size:12px;padding:8px;outline:none;}
+.add-btn{background:var(--accent);color:#000;border:none;font-size:16px;width:34px;cursor:pointer;font-weight:900;}
+.ctr{display:flex;align-items:center;justify-content:center;gap:20px;padding:12px 0;}
+.ctrv{font-size:48px;font-weight:900;color:var(--accent);}
+.ctr-btn{background:var(--surface2);border:1px solid var(--line);color:#fff;font-size:22px;width:44px;height:44px;cursor:pointer;}
+.prog-bar{background:var(--surface2);height:12px;margin:8px 0;}
+.prog-fill{height:100%;background:var(--accent);transition:width 0.3s;}
+.prog-pct{font-size:24px;font-weight:900;color:var(--accent);}
+.notes-ta{width:100%;background:var(--surface2);border:1px solid var(--line);color:#fff;font-size:12px;padding:10px;resize:vertical;min-height:100px;outline:none;}
+.kanban{display:flex;gap:10px;overflow-x:auto;}
+.kcol{flex:1;min-width:130px;background:var(--surface2);padding:10px;}
+.kcol-title{font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+.kcard{background:var(--surface);border:1px solid var(--line);border-left:2px solid var(--accent);padding:8px;margin-bottom:6px;font-size:11px;color:#ccc;cursor:pointer;}
+.kadd{width:100%;background:transparent;border:1px dashed var(--line);color:#444;font-size:11px;padding:6px;cursor:pointer;margin-top:4px;}
+.pb{background:var(--surface2);border-left:3px solid #a855f7;padding:12px;margin-bottom:10px;}
+.pb-label{font-size:9px;letter-spacing:2px;color:#a855f7;text-transform:uppercase;margin-bottom:6px;font-weight:700;}
+.pb-text{font-size:11px;color:#aaa;line-height:1.7;}
+.rec-table{display:block;overflow-x:auto;}
+.rec-head,.rec-row{display:grid;gap:6px;align-items:center;}
+.rec-head{padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:6px;}
+.rec-th{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);font-weight:700;}
+.rec-row{padding:5px 0;border-bottom:1px solid var(--surface2);}
+.rec-input,.rec-status{width:100%;background:var(--surface2);border:1px solid var(--line);color:var(--text);font-size:12px;padding:6px 8px;outline:none;border-radius:4px;}
+.rec-input:focus,.rec-status:focus{border-color:var(--accent);}
+.rec-status{cursor:pointer;}
+.rec-empty{font-size:12px;color:var(--text-dim);padding:14px 0;text-align:center;}
+.rec-del{background:none;border:none;color:var(--text-dim);font-size:18px;cursor:pointer;line-height:1;}
+.rec-add-row{margin-top:10px;width:100%;background:transparent;border:1px dashed var(--line);color:var(--accent);font-size:12px;font-weight:700;padding:9px;cursor:pointer;border-radius:5px;}
+/* CHAT */
+.chat-fab{position:fixed;bottom:20px;right:20px;width:52px;height:52px;background:var(--accent);color:#000;border:none;border-radius:50%;font-size:22px;cursor:pointer;z-index:99;box-shadow:0 4px 20px rgba(0,0,0,0.4);}
+.chat-panel{display:none;position:fixed;bottom:80px;right:20px;width:320px;height:480px;background:var(--surface);border:1px solid var(--line);flex-direction:column;z-index:100;box-shadow:0 8px 40px rgba(0,0,0,0.5);}
+.chat-panel.open{display:flex;}
+.chat-hdr{padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+.chat-hdr-title{font-size:13px;font-weight:800;color:var(--accent);}
+.chat-close{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:18px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;}
+.cmsg{padding:8px 12px;border-radius:4px;font-size:12px;line-height:1.6;max-width:90%;}
+.cmsg.ai{background:var(--surface2);border-left:2px solid var(--accent);align-self:flex-start;}
+.cmsg.user{background:var(--surface2);align-self:flex-end;}
+.voice-row{padding:8px 10px;border-top:1px solid var(--line);display:flex;justify-content:center;}
+.voice-btn{background:var(--accent);color:#000;border:none;border-radius:24px;padding:10px 22px;font-size:13px;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:8px;}
+.voice-btn.listening{background:#ff4d4d;color:#fff;animation:pulse 1.2s infinite;}
+.voice-btn.speaking{background:#3a9bff;color:#fff;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.55}}
+.chat-input-wrap{padding:10px;border-top:1px solid var(--line);display:flex;gap:6px;}
+.chat-in{flex:1;background:var(--surface2);border:1px solid var(--line);color:#fff;font-size:12px;padding:8px;outline:none;}
+.chat-send{background:var(--accent);color:#000;border:none;padding:8px 14px;cursor:pointer;font-weight:800;font-size:13px;}
+.settings-panel{display:none;position:fixed;bottom:80px;right:20px;width:280px;background:var(--surface);border:1px solid var(--line);padding:16px;z-index:101;}
+.settings-panel.open{display:block;}
+.settings-label{font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;margin-bottom:8px;}
+.settings-input{width:100%;background:var(--surface2);border:1px solid var(--line);color:#fff;font-size:12px;padding:8px;outline:none;margin-bottom:8px;}
+.settings-save{background:var(--accent);color:#000;border:none;font-size:12px;font-weight:800;padding:8px 16px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>Lead Tracker</h1>
+  <p></p>
+  <span class="powered">Powered by Groq · Free AI</span>
+</div>
+<div class="tabs" id="tabs"><button class="tab active" onclick="showTab(0)">Projects</button></div>
+<div class="panel active" id="panel_0"><div class="widget"><div class="wt">Projects</div><div id="rec_0_0"></div></div></div>
+
+<button class="chat-fab" onclick="toggleChat()" title="AI Assistant">💬</button>
+<button class="chat-fab" onclick="toggleSettings()" title="Set your AI key" style="bottom:84px;width:42px;height:42px;font-size:18px;background:#111118;color:#00ff88;border:1px solid #00ff88;">⚙</button>
+<div class="chat-panel" id="chat-panel">
+  <div class="chat-hdr"><span class="chat-hdr-title">AI Assistant</span><button class="chat-close" onclick="toggleChat()">×</button></div>
+  <div class="chat-msgs" id="chat-msgs"><div class="cmsg ai">Hi! I'm your assistant for this dashboard. Tap the mic to talk hands-free, or type. Tell me to change colors, add tabs, add tasks — I'll do it live.</div></div>
+  <div class="voice-row"><button class="voice-btn" id="voice-btn" onclick="toggleVoice()">🎤 Tap to talk</button></div>
+  <div class="chat-input-wrap">
+    <input class="chat-in" id="chat-in" placeholder="Or type here..." onkeydown="if(event.key==='Enter')dashSend()"/>
+    <button class="chat-send" onclick="dashSend()">→</button>
+  </div>
+</div>
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-label">Your Free Groq API Key</div>
+  <input class="settings-input" type="password" id="settings-key" placeholder="gsk_..." value=""/>
+  <button class="settings-save" onclick="saveKey()">Save Key</button>
+  <p style="font-size:10px;color:#444;margin-top:8px;">Get free at console.groq.com/keys</p>
+</div>
+
+<script>
+const DASH_DATA = {"name":"Lead Tracker","tagline":"","tabs":[{"title":"Projects","widgets":[{"type":"records","title":"Projects","fields":[{"label":"Date","type":"date","options":[]},{"label":"Status","type":"status","options":["New","In Progress","Done"]},{"label":"Progress","type":"number","options":[]},{"label":"Notes","type":"text","options":[]},{"label":"Priority","type":"text","options":[]}],"rows":[]}]}],"activeTab":0};
+const GROQ_MODEL = 'llama-3.1-8b-instant';
+const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
+let dashKey = localStorage.getItem('dash_ai_key') || '';
+let chatHistory = [];
+window.addEventListener('DOMContentLoaded', function(){
+  if (dashKey) { var f = document.getElementById('settings-key'); if (f) f.value = dashKey; }
+});
+const SYSTEM = 'You are a helpful AI assistant inside the Lead Tracker dashboard. Help the user manage their tasks, answer questions, and give advice related to their dashboard. Keep responses short and friendly.';
+
+function showTab(i) {
+  document.querySelectorAll('.tab').forEach((t,idx)=>t.className='tab'+(idx===i?' active':''));
+  document.querySelectorAll('.panel').forEach((p,idx)=>p.className='panel'+(idx===i?' active':''));
+}
+
+function toggleChat() {
+  const p = document.getElementById('chat-panel');
+  const sp = document.getElementById('settings-panel');
+  sp.classList.remove('open');
+  p.classList.toggle('open');
+}
+
+function toggleSettings() {
+  const p = document.getElementById('settings-panel');
+  const cp = document.getElementById('chat-panel');
+  cp.classList.remove('open');
+  p.classList.toggle('open');
+}
+
+function saveKey() {
+  const k = document.getElementById('settings-key').value.trim();
+  if (k) { localStorage.setItem('dash_ai_key', k); dashKey = k; alert('Key saved!'); document.getElementById('settings-panel').classList.remove('open'); }
+}
+
+function addChatMsg(role, text) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  div.className = 'cmsg ' + role;
+  div.textContent = text;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+async function dashSend() {
+  const input = document.getElementById('chat-in');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  if (!dashKey) {
+    addChatMsg('ai', 'First time? Tap the ⚙ button (just above) and paste your free Groq key once — it stays private in your browser and you will not be asked again.');
+    document.getElementById('settings-panel').classList.add('open');
+    document.getElementById('chat-panel').classList.remove('open');
+    return;
+  }
+  addChatMsg('user', text);
+  chatHistory.push({ role: 'user', content: text });
+  const messages = [{ role:'system', content:SYSTEM }, ...chatHistory];
+  try {
+    const res = await fetch(GROQ_URL, {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + dashKey },
+      body: JSON.stringify({ model: GROQ_MODEL, messages, max_tokens: 500, temperature: 0.7 })
+    });
+    const data = await res.json();
+    if (!res.ok) { addChatMsg('ai', 'Error: ' + (data.error?.message || 'Check your key')); return; }
+    const reply = data.choices?.[0]?.message?.content || '';
+    chatHistory.push({ role: 'assistant', content: reply });
+    addChatMsg('ai', reply);
+  } catch(e) { addChatMsg('ai', 'Network error.'); }
+}
+
+// Widget interactions
+function toggleCheck(tabI, wi, ii) {
+  // stored in localStorage per dashboard
+  const key = 'dash_checks';
+  const stored = JSON.parse(localStorage.getItem(key) || '{}');
+  const k = tabI+'_'+wi+'_'+ii;
+  stored[k] = !stored[k];
+  localStorage.setItem(key, JSON.stringify(stored));
+  const chk = document.getElementById('chk_'+tabI+'_'+wi+'_'+ii);
+  const txt = document.getElementById('txt_'+tabI+'_'+wi+'_'+ii);
+  if (stored[k]) { chk.className='chk done'; chk.textContent='✓'; if(txt)txt.className='li-text done'; }
+  else { chk.className='chk'; chk.textContent=''; if(txt)txt.className='li-text'; }
+}
+function addItem(tabI, wi) {
+  const input = document.getElementById('addinput_'+tabI+'_'+wi);
+  const val = input.value.trim();
+  if (!val) return;
+  const list = document.getElementById('list_'+tabI+'_'+wi);
+  const ii = list.children.length;
+  const div = document.createElement('div');
+  div.className = 'list-item';
+  div.innerHTML = '<div class="chk" id="chk_'+tabI+'_'+wi+'_'+ii+'" onclick="toggleCheck('+tabI+','+wi+','+ii+')"></div><div class="li-text" id="txt_'+tabI+'_'+wi+'_'+ii+'">'+val+'</div>';
+  list.appendChild(div);
+  input.value = '';
+}
+function changeCounter(id, delta) {
+  const el = document.getElementById(id);
+  el.textContent = parseInt(el.textContent) + delta;
+}
+
+// ── RECORDS runtime (typed, fillable, saved) ──
+function recKey(ti,wi){return 'rec_data_'+ti+'_'+wi;}
+function recLoad(ti,wi){try{return JSON.parse(localStorage.getItem(recKey(ti,wi))||'[]');}catch(e){return [];}}
+function recSave(ti,wi,rows){localStorage.setItem(recKey(ti,wi),JSON.stringify(rows));}
+function recFieldsFor(ti,wi){var t=DASH_DATA.tabs[ti];if(!t)return [];var w=t.widgets[wi];return (w&&w.fields)||[];}
+function recInput(ti,wi,ri,fi,field,value){
+  var t=field.type||'text';
+  if(t==='checkbox'){return '<div class="chk'+(value?' done':'')+'" onclick="recToggle('+ti+','+wi+','+ri+','+fi+')">'+(value?'✓':'')+'</div>';}
+  if(t==='status'){var opts=(field.options&&field.options.length)?field.options:['New','In Progress','Done'];return '<select class="rec-status" onchange="recSet('+ti+','+wi+','+ri+','+fi+',this.value)"><option value="">—</option>'+opts.map(function(o){return '<option '+(value===o?'selected':'')+'>'+o+'</option>';}).join('')+'</select>';}
+  var it=t==='date'?'date':(t==='number'?'number':'text');
+  return '<input class="rec-input" type="'+it+'" value="'+String(value||'').replace(/"/g,'&quot;')+'" placeholder="'+(field.label||'')+'" onchange="recSet('+ti+','+wi+','+ri+','+fi+',this.value)"/>';
+}
+function recToggle(ti,wi,ri,fi){var rows=recLoad(ti,wi);if(!rows[ri])rows[ri]=[];rows[ri][fi]=rows[ri][fi]?'':'1';recSave(ti,wi,rows);recRender(ti,wi);}
+function recRender(ti,wi){
+  var host=document.getElementById('rec_'+ti+'_'+wi); if(!host)return;
+  var fields=recFieldsFor(ti,wi); var rows=recLoad(ti,wi);
+  var cols='repeat('+fields.length+',minmax(90px,1fr)) 34px';
+  var head=fields.map(function(f){return '<div class="rec-th">'+f.label+'</div>';}).join('')+'<div class="rec-th"></div>';
+  var body=rows.map(function(row,ri){
+    var cells=fields.map(function(f,fi){return '<div class="rec-td">'+recInput(ti,wi,ri,fi,f,row[fi])+'</div>';}).join('');
+    return '<div class="rec-row" style="grid-template-columns:'+cols+'">'+cells+'<div class="rec-td"><button class="rec-del" onclick="recDel('+ti+','+wi+','+ri+')">×</button></div></div>';
+  }).join('');
+  host.innerHTML='<div class="rec-table"><div class="rec-head" style="grid-template-columns:'+cols+'">'+head+'</div><div>'+(body||'<div class="rec-empty">No entries yet — tap + Add row.</div>')+'</div></div><button class="rec-add-row" onclick="recAdd('+ti+','+wi+')">+ Add row</button>';
+}
+function recAdd(ti,wi){var rows=recLoad(ti,wi);rows.push(new Array(recFieldsFor(ti,wi).length).fill(''));recSave(ti,wi,rows);recRender(ti,wi);}
+function recDel(ti,wi,ri){var rows=recLoad(ti,wi);rows.splice(ri,1);recSave(ti,wi,rows);recRender(ti,wi);}
+function recSet(ti,wi,ri,fi,val){var rows=recLoad(ti,wi);if(!rows[ri])rows[ri]=[];rows[ri][fi]=val;recSave(ti,wi,rows);recRender(ti,wi);}
+function recRenderAll(){DASH_DATA.tabs.forEach(function(t,ti){(t.widgets||[]).forEach(function(w,wi){if(w.type==='records')recRender(ti,wi);});});}
+window.addEventListener('DOMContentLoaded',recRenderAll);
+</script>
+</body>
+</html>
